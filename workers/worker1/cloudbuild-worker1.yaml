@@ -2,8 +2,8 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-# Build
-- name: us-central1-docker.pkg.dev/google.com/cloudsdktool/cloud-sdk
+# Build + Auth + Push (same container)
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: bash
   args:
     - -c
@@ -15,7 +15,7 @@ steps:
       docker push us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA
 
 # Deploy
-- name: us-central1-docker.pkg.dev/google.com/cloudsdktool/cloud-sdk
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: gcloud
   args:
     [
