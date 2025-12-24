@@ -1,13 +1,22 @@
 options:
   logging: CLOUD_LOGGING_ONLY
+
 steps:
 - name: gcr.io/cloud-builders/docker
   args:
-    ["build","-t","us-central1-docker.pkg.dev/$PROJECT_ID/workers/gpu-worker:worker1-$COMMIT_SHA","."]
+    [
+      "build",
+      "-f","workers/worker1/Dockerfile",
+      "-t","us-central1-docker.pkg.dev/$PROJECT_ID/workers/gpu-worker:worker1-$COMMIT_SHA",
+      "workers/worker1"
+    ]
 
 - name: gcr.io/cloud-builders/docker
   args:
-    ["push","us-central1-docker.pkg.dev/$PROJECT_ID/workers/gpu-worker:worker1-$COMMIT_SHA"]
+    [
+      "push",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/workers/gpu-worker:worker1-$COMMIT_SHA"
+    ]
 
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: gcloud
