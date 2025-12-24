@@ -3,36 +3,19 @@ options:
 
 steps:
 # Build
-- name: gcr.io/cloud-builders/docker
+- name: us-central1-docker.pkg.dev/google.com/cloudsdktool/cloud-sdk
+  entrypoint: bash
   args:
-    [
-      "build",
-      "-f","workers/worker1/Dockerfile",
-      "-t","us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA",
-      "workers/worker1"
-    ]
-
-# Auth
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  entrypoint: gcloud
-  args:
-    [
-      "auth",
-      "configure-docker",
-      "us-central1-docker.pkg.dev",
-      "--quiet"
-    ]
-
-# Push
-- name: gcr.io/cloud-builders/docker
-  args:
-    [
-      "push",
-      "us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA"
-    ]
+    - -c
+    - |
+      gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+      docker build -f workers/worker1/Dockerfile \
+        -t us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA \
+        workers/worker1
+      docker push us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA
 
 # Deploy
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+- name: us-central1-docker.pkg.dev/google.com/cloudsdktool/cloud-sdk
   entrypoint: gcloud
   args:
     [
