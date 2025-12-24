@@ -2,19 +2,25 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-# Build + Auth + Push (same container)
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  entrypoint: bash
+# 1️⃣ Build image
+- name: gcr.io/cloud-builders/docker
   args:
-    - -c
-    - |
-      gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-      docker build -f workers/worker1/Dockerfile \
-        -t us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA \
-        workers/worker1
-      docker push us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA
+    [
+      "build",
+      "-f","workers/worker1/Dockerfile",
+      "-t","us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA",
+      "workers/worker1"
+    ]
 
-# Deploy
+# 2️⃣ Push image (Cloud Build auto-auths)
+- name: gcr.io/cloud-builders/docker
+  args:
+    [
+      "push",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/workers/worker1:$COMMIT_SHA"
+    ]
+
+# 3️⃣ Deploy to Cloud Run
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: gcloud
   args:
